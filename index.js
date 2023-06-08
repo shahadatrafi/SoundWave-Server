@@ -26,14 +26,19 @@ async function run() {
       await client.connect();
 
       const classesCollection = client.db('SoundWave').collection('classes');
+      const teachersCollection = client.db('SoundWave').collection('teachers');
       
     //   classes api
       app.get('/classes', async (req, res) => {
-          const result = await classesCollection.find().toArray();
+          const result = await classesCollection.find().sort({ students: -1 }).toArray();
           res.send(result);
       })
 
-
+    //   instructors api
+    app.get('/instructors', async (req, res) => {
+        const result = await teachersCollection.find().toArray();
+        res.send(result);
+    })
 
 
 
