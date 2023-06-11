@@ -31,7 +31,11 @@ async function run() {
       const cartCollection = client.db('SoundWave').collection('carts')
     
     // 
-    
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    })
     
     //   classes api
       app.get('/classes', async (req, res) => {
