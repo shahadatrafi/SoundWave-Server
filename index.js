@@ -27,12 +27,20 @@ async function run() {
 
       const classesCollection = client.db('SoundWave').collection('classes');
       const teachersCollection = client.db('SoundWave').collection('teachers');
-      
+    const cartCollection = client.db('SoundWave').collection('carts')
+    
     //   classes api
       app.get('/classes', async (req, res) => {
           const result = await classesCollection.find().sort({ students: -1 }).toArray();
           res.send(result);
       })
+    
+    // carts api
+    app.post('/carts', async(req, res) => {
+      const selectedClass = req.body;
+      const result = await cartCollection.insertOne(selectedClass);
+      res.send(result);
+    })
 
     //   instructors api
     app.get('/instructors', async (req, res) => {
