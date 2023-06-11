@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
@@ -25,9 +25,13 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
       await client.connect();
 
+      const usersCollection = client.db('SoundWave').collection('users');
       const classesCollection = client.db('SoundWave').collection('classes');
       const teachersCollection = client.db('SoundWave').collection('teachers');
-    const cartCollection = client.db('SoundWave').collection('carts')
+      const cartCollection = client.db('SoundWave').collection('carts')
+    
+    // 
+    
     
     //   classes api
       app.get('/classes', async (req, res) => {
@@ -49,6 +53,14 @@ async function run() {
     app.post('/carts', async(req, res) => {
       const selectedClass = req.body;
       const result = await cartCollection.insertOne(selectedClass);
+      res.send(result);
+    })
+
+    app.delete('/carts/:id', async (req, res) => {
+      const id = req.params.id
+      
+      const query = { _id: new ObjectId(id) }
+      const result = await cartCollection.deleteOne(query)
       res.send(result);
     })
 
