@@ -33,6 +33,13 @@ async function run() {
     // 
     app.post('/users', async (req, res) => {
       const user = req.body;
+
+      const query = { email: user.email }
+      const existingUser = await usersCollection.findOne(query);
+      if (existingUser) {
+        return res.send('user already exist')
+      }
+
       const result = await usersCollection.insertOne(user);
       res.send(result);
     })
@@ -59,7 +66,7 @@ async function run() {
       const result = await cartCollection.insertOne(selectedClass);
       res.send(result);
     })
-
+    
     app.delete('/carts/:id', async (req, res) => {
       const id = req.params.id
       
