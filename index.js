@@ -23,13 +23,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-      await client.connect();
+    await client.connect();
 
-      const usersCollection = client.db('SoundWave').collection('users');
-      const classesCollection = client.db('SoundWave').collection('classes');
-      const teachersCollection = client.db('SoundWave').collection('teachers');
-      const cartCollection = client.db('SoundWave').collection('carts')
-    
+    const usersCollection = client.db('SoundWave').collection('users');
+    const classesCollection = client.db('SoundWave').collection('classes');
+    const teachersCollection = client.db('SoundWave').collection('teachers');
+    const cartCollection = client.db('SoundWave').collection('carts')
+
     // user api
     app.get('/users', async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -48,25 +48,41 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result);
     })
+
+    app.put('/users/:id', async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          role: 'instructor'
+        },
+      };
+      const result = await usersCollection.updateOne(query, updateDoc);
+      res.send(result);
+    })
     
+    
+
+
     //   classes api
-      app.get('/classes', async (req, res) => {
-          const result = await classesCollection.find().sort({ students: -1 }).toArray();
-          res.send(result);
-      })
-    
+    app.get('/classes', async (req, res) => {
+      const result = await classesCollection.find().sort({ students: -1 }).toArray();
+      res.send(result);
+    })
+
     // carts api
     app.get('/carts', async (req, res) => {
       const email = req.query?.email;
-      if(!email) {
-       res.send([]);
+      if (!email) {
+        res.send([]);
       };
       const query = { email: email }
       const result = await cartCollection.find(query).toArray();
       res.send(result);
     })
 
-    app.post('/carts', async(req, res) => {
+    app.post('/carts', async (req, res) => {
       const selectedClass = req.body;
       const result = await cartCollection.insertOne(selectedClass);
       res.send(result);
@@ -74,7 +90,7 @@ async function run() {
 
     app.delete('/carts/:id', async (req, res) => {
       const id = req.params.id
-      
+
       const query = { _id: new ObjectId(id) }
       const result = await cartCollection.deleteOne(query)
       res.send(result);
@@ -82,8 +98,21 @@ async function run() {
 
     //   instructors api
     app.get('/instructors', async (req, res) => {
-        const result = await teachersCollection.find().toArray();
-        res.send(result);
+      const result = await teachersCollection.find().toArray();
+      res.send(result);
+    })
+    
+    app.post('/instructors', async (req, res) => {
+      const user = req.body;
+
+      const query = { email: user.email }
+      const existingUser = await teachersCollection.findOne(query);
+      if (existingUser) {
+        return res.send('user already exist')
+      }
+
+      const result = await teachersCollection.insertOne(user);
+      res.send(result);
     })
 
 
@@ -99,9 +128,9 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('sound wave server is running')
+  res.send('sound wave server is running')
 })
 
 app.listen(port, () => {
-    console.log('server is running on ', port);
+  console.log('server is running on ', port);
 })
