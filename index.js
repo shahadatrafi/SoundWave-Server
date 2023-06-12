@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 require('dotenv').config()
+var jwt = require('jsonwebtoken');
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -29,6 +31,13 @@ async function run() {
     const classesCollection = client.db('SoundWave').collection('classes');
     const teachersCollection = client.db('SoundWave').collection('teachers');
     const cartCollection = client.db('SoundWave').collection('carts')
+
+    // jwt token
+    app.post('/jwt', (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+      res.send({token})
+    })
 
     // user api
     app.get('/users', async (req, res) => {
@@ -109,7 +118,7 @@ async function run() {
 
     //   instructors api
     app.get('/instructors', async (req, res) => {
-      const result = await teachersCollection.find().toArray();
+      const result = await teachersCollection.find().limit(6).toArray();
       res.send(result);
     })
     
