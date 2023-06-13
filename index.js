@@ -145,6 +145,27 @@ async function run() {
       res.send(result);
     })
 
+    app.post('/classes',verifyJWT, verifyInstructor, async (req, res) => {
+      const newClass = req.body;
+      const result = await classesCollection.insertOne(newClass);
+      res.send(result)
+    })
+
+    app.put('/classes/approved/:id', async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          status: 'approved'
+        },
+      };
+      const result = await classesCollection.updateOne(query, updateDoc);
+      res.send(result);
+    })
+    
+    
+
     // carts api
     app.get('/carts', verifyJWT, async (req, res) => {
       const email = req.query?.email;
