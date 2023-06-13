@@ -56,8 +56,19 @@ async function run() {
       res.send({token})
     })
 
+    // Verify Admin Check middleware
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email }
+      const user = await usersCollection.findOne(query);
+      if (user?.role !== 'admin') {
+        return res.status(403).send({error: true, message: 'forbidden access'})
+      }
+      next();
+    }
+
     // user api
-    app.get('/users', verifyJWT, async (req, res) => {
+    app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     })
