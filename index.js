@@ -57,7 +57,7 @@ async function run() {
     })
 
     // user api
-    app.get('/users', async (req, res) => {
+    app.get('/users', verifyJWT, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     })
@@ -92,7 +92,7 @@ async function run() {
       const email = req.params.email;
 
       if (req.decoded.email !== email) {
-        return res.send({admin: false})
+      return res.send({admin: false})
       }
 
       const query = { email: email }
