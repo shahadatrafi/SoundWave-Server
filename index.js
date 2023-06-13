@@ -75,7 +75,7 @@ async function run() {
       res.send(result);
     })
 
-    app.put('/users/:id', async (req, res) => {
+    app.put('/users/instructors/:id', async (req, res) => {
       const id = req.params.id;
 
       const query = { _id: new ObjectId(id) }
@@ -88,7 +88,20 @@ async function run() {
       res.send(result);
     })
     
-    app.patch('/users/:id', async (req, res) => {
+    app.get('/users/admin/:email', verifyJWT, async (req, res) => {
+      const email = req.params.email;
+
+      if (req.decoded.email !== email) {
+        return res.send({admin: false})
+      }
+
+      const query = { email: email }
+      const user = await usersCollection.findOne(query);
+      const result = { admin: user?.role === 'admin' }
+      res.send(result);
+    })
+
+    app.patch('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
 
       const query = { _id: new ObjectId(id) }
