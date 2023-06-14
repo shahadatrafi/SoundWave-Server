@@ -145,6 +145,8 @@ async function run() {
       const result = await classesCollection.find().sort({ students: -1 }).toArray();
       res.send(result);
     })
+    
+    
 
     app.post('/classes', verifyJWT, verifyInstructor, async (req, res) => {
       const newClass = req.body;
@@ -184,6 +186,14 @@ async function run() {
       if (!email) {
         res.send([]);
       };
+
+      app.get('/carts/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }
+        console.log(id);
+        const result = await cartCollection.findOne(query);
+        res.send(result);
+      })
 
       const decodedEmail = req.decoded.email;
       if (email !== decodedEmail) {
