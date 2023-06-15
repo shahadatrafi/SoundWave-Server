@@ -273,10 +273,20 @@ async function run() {
       const item = req.body;
       const InsertedResult = await paymentCollection.insertOne(item)
 
-      const query = { _id: new ObjectId(item.classId), email: item.email}
+      
+
+      const updateQuery = { _id: new ObjectId(item.cartClassId) }
+      const updateDoc = {
+        $set: {
+          students: students + 1
+        },
+      }
+      const updatedResult = await classesCollection(updateQuery, updateDoc);
+
+      const query = { _id: new ObjectId(item.classId),}
       const deletedResult = await cartCollection.deleteOne(query);
 
-      res.send({InsertedResult, deletedResult});
+      res.send({InsertedResult, updatedResult, deletedResult});
     })
 
 
