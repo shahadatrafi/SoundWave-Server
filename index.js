@@ -271,8 +271,12 @@ async function run() {
     // payment collection api's
     app.post('/payments', async (req, res) => {
       const item = req.body;
-      const result = await paymentCollection.insertOne(item)
-      res.send(result);
+      const InsertedResult = await paymentCollection.insertOne(item)
+
+      const query = { _id: new ObjectId(item.classId), email: item.email}
+      const deletedResult = await cartCollection.deleteOne(query);
+
+      res.send({InsertedResult, deletedResult});
     })
 
 
