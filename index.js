@@ -49,6 +49,7 @@ async function run() {
     const classesCollection = client.db('SoundWave').collection('classes');
     const teachersCollection = client.db('SoundWave').collection('teachers');
     const cartCollection = client.db('SoundWave').collection('carts')
+    const paymentCollection = client.db('SoundWave').collection('payments')
 
     // jwt token
     app.post('/jwt', (req, res) => {
@@ -253,7 +254,7 @@ async function run() {
     })
 
     // Payment api
-    app.post("/create-payment-intent", async (req, res) => {
+    app.post('/create-payment-intent',verifyJWT, async (req, res) => {
       const { price } = req.body;
       const amount = price * 100;
 
@@ -267,6 +268,12 @@ async function run() {
       });
     })
 
+    // payment collection api's
+    app.post('/payments', async (req, res) => {
+      const item = req.body;
+      const result = await paymentCollection.insertOne(item)
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
