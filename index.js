@@ -43,7 +43,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const usersCollection = client.db('SoundWave').collection('users');
     const classesCollection = client.db('SoundWave').collection('classes');
@@ -273,12 +273,10 @@ async function run() {
       const item = req.body;
       const InsertedResult = await paymentCollection.insertOne(item)
 
-      
-
       const updateQuery = { _id: new ObjectId(item.cartClassId) }
       const updateDoc = {
-        $set: {
-          students: students + 1
+        $inc: {
+          students: 1
         },
       }
       const updatedResult = await classesCollection(updateQuery, updateDoc);
@@ -287,6 +285,11 @@ async function run() {
       const deletedResult = await cartCollection.deleteOne(query);
 
       res.send({InsertedResult, updatedResult, deletedResult});
+    })
+
+    app.get('/payments', async (req, res) => {
+      const result = await paymentCollection.find().toArray();
+      res.send(result);
     })
 
 
